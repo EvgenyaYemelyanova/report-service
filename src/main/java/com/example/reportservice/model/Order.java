@@ -32,4 +32,13 @@ public class Order {
     @FutureOrPresent
     @Column(name = "ordered_to")
     LocalDateTime to;
+
+    public Order(Long id, Long buildingId, Long apartmentId, Long customerId, LocalDateTime from, LocalDateTime to) {
+        this.id = id;
+        this.buildingId = buildingId;
+        this.apartmentId = apartmentId;
+        this.customerId = customerId;
+        this.from = from;
+        this.to = to;
+    }
 }
