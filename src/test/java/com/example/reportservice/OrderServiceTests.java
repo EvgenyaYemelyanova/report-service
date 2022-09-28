@@ -11,11 +11,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTests {
@@ -31,9 +34,9 @@ public class OrderServiceTests {
 
     @Test
     public void savedOrder() {
-        Order order = new Order(
-                1L, 2L, 3L, 3L,
-                LocalDateTime.now(), LocalDateTime.now());
+        long orderId = 1;
+        LocalDateTime time = LocalDateTime.now();
+        Order order = new Order(orderId, 2L, 3L, 3L, time, time);
 
         when(orderRepository.save(any(Order.class))).thenReturn(order);
 
@@ -48,5 +51,43 @@ public class OrderServiceTests {
                 null, null, null, null, null, null);
 
         lenient().when(orderRepository.save(order)).thenThrow(NullPointerException.class);
+    }
+
+    @Test
+    public void getOrderById() {
+        long orderId = 1;
+        LocalDateTime time = LocalDateTime.now();
+        Order order = new Order(orderId, 2L, 3L, 3L, time, time);
+
+        when(orderRepository.findById(1L)).thenReturn(Optional.of(order));
+
+        Order savedOrder = orderService.getOrderById(1L);
+        assertThat(savedOrder.getId()).isNotNull();
+        System.out.println(order);
+    }
+
+    @Test
+    public void deleteOrder() {
+        long orderId = 1;
+        LocalDateTime time = LocalDateTime.now();
+        Order order = new Order(orderId, 2L, 3L, 3L, time, time);
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        orderService.deleteOrder(orderId);
+        verify(orderRepository).delete(order);
+    }
+
+    @Test
+    public void getAllOrders() {
+        LocalDateTime time = LocalDateTime.now();
+        when(orderRepository.findAll()).thenReturn(Arrays.asList(
+                new Order(1L, 2L, 3L, 4L, time, time),
+                new Order(5L, 6L, 7L, 8L, time, time)
+        ));
+
+        List<Order> getAllOrders = orderService.getAllOrders();
+        assertEquals(2, getAllOrders.size());
+        verify(orderRepository).findAll();
     }
 }
