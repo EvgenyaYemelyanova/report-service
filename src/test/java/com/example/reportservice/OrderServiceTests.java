@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -89,5 +90,20 @@ public class OrderServiceTests {
         List<Order> getAllOrders = orderService.getAllOrders();
         assertEquals(2, getAllOrders.size());
         verify(orderRepository).findAll();
+    }
+
+    @Test
+    public void getAllOrdersByDate() {
+        LocalDateTime myTime = LocalDateTime.of(2023, Month.FEBRUARY,3,6,30,40,50000);
+        LocalDateTime fromTime = LocalDateTime.of(2022, Month.FEBRUARY,3,6,30,40,50000);
+        LocalDateTime toTime = LocalDateTime.of(2022, Month.FEBRUARY,3,6,30,40,50000);
+        when(orderRepository.getAllOrdersWhereDatesBetween(fromTime, toTime)).thenReturn(Arrays.asList(
+                new Order(1L, 2L, 3L, 4L, fromTime, toTime),
+                new Order(5L, 6L, 7L, 8L, myTime, myTime)
+        ));
+
+        List<Order> getAllOrders = orderService.getAllOrdersByDate(fromTime, toTime);
+        verify(orderRepository).getAllOrdersWhereDatesBetween(fromTime, toTime);
+        System.out.println(getAllOrders);
     }
 }
